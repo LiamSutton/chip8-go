@@ -1,5 +1,7 @@
 package vm
 
+import "fmt"
+
 // Fontset : the characters 0-F represented in hex
 var fontset = []uint8{
 	0xF0, 0x90, 0x90, 0x90, 0xf0, // 0
@@ -41,6 +43,12 @@ func NewCPU() *CPU {
 	cpu := CPU{}
 
 	return &cpu
+}
+
+// PrintStatus displays the current status of the CPU
+func (cpu *CPU) PrintStatus() {
+	fmt.Println("Display: ", cpu.display)
+	fmt.Println("V Registers: ", cpu.v)
 }
 
 // ResetCPU sets the CPU to an initial state ready to run
