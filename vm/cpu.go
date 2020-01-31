@@ -47,8 +47,8 @@ func NewCPU() *CPU {
 
 // PrintStatus displays the current status of the CPU
 func (cpu *CPU) PrintStatus() {
-	fmt.Println("\n-- PRINTING STATUS OF CPU --\n")
-	fmt.Printf("V Registers: \n%v \n", cpu.v)
+	fmt.Println("\n-- PRINTING STATUS OF CPU --")
+	fmt.Printf("\nV Registers: \n%v \n", cpu.v)
 	fmt.Printf("\nStack: \n%v \n", cpu.stack)
 	fmt.Printf("\nStack Pointer: \nHEX: 0x%X \nDEC: %d \n", cpu.sp, cpu.sp)
 	fmt.Printf("\nIndex Register: \nHEX: 0x%X \nDEC: %d \n", cpu.i, cpu.i)
@@ -61,12 +61,11 @@ func (cpu *CPU) PrintStatus() {
 	fmt.Println("\n-- FINISHED PRINTING STATUS OF CPU --")
 }
 
-
 // ResetCPU sets the CPU to an initial state ready to run
 func (cpu *CPU) ResetCPU() {
 	cpu.pc = 0x200                 // Program counter starts ot 0x200
 	cpu.opcode = 0x0               // Reset current opcode
-	cpu.i = 0x0                // Reset index register
+	cpu.i = 0x0                    // Reset index register
 	cpu.sp = 0x0                   // Reset stack pointer
 	cpu.display = [64 * 32]uint8{} // Clear the display
 	cpu.stack = [16]uint16{}       // Clear the stack
@@ -79,4 +78,15 @@ func (cpu *CPU) ResetCPU() {
 
 	cpu.delayTimer = 0x0 // Reset the delay timer
 	cpu.soundTimer = 0x0 // Reset the sound timer
+}
+
+// EmulateCycle will fetch, decode and execute a single opcode
+func (cpu *CPU) EmulateCycle() {
+	// Fetch Opcode
+	cpu.opcode = uint16(cpu.memory[cpu.pc])<<8 | uint16(cpu.memory[cpu.pc+1])
+
+	switch cpu.opcode {
+	default:
+		fmt.Printf("Unimplimented opcode: 0x%X", cpu.opcode)
+	}
 }

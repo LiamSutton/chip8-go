@@ -1,14 +1,20 @@
 package main
 
 import (
-	"fmt"
 	"github.com/LiamSutton/chip8-go/vm"
 )
 
+var roms = []string{"roms/Chip8 Picture.ch8"}
+
 func main() {
-	fmt.Println("Hello World!")
 	cpu := vm.NewCPU()
 	cpu.ResetCPU()
-	cpu.PrintStatus()
 
+	rom := vm.ReadROM(roms[0])
+
+	cpu.LoadROM(rom)
+
+	for {
+		cpu.EmulateCycle()
+	}
 }
