@@ -47,15 +47,26 @@ func NewCPU() *CPU {
 
 // PrintStatus displays the current status of the CPU
 func (cpu *CPU) PrintStatus() {
-	fmt.Println("Display: ", cpu.display)
-	fmt.Println("V Registers: ", cpu.v)
+	fmt.Println("\n-- PRINTING STATUS OF CPU --\n")
+	fmt.Printf("V Registers: \n%v \n", cpu.v)
+	fmt.Printf("\nStack: \n%v \n", cpu.stack)
+	fmt.Printf("\nStack Pointer: \nHEX: 0x%X \nDEC: %d \n", cpu.sp, cpu.sp)
+	fmt.Printf("\nIndex Register: \nHEX: 0x%X \nDEC: %d \n", cpu.i, cpu.i)
+	fmt.Printf("\nProgram Counter: \nHEX: 0x%X \nDEC: %d \n", cpu.pc, cpu.pc)
+	fmt.Printf("\nCurrent Opcode: \nHEX: 0x%X \nDEC: %d \n", cpu.opcode, cpu.opcode)
+	fmt.Printf("\nDraw Flag: \n%v \n", cpu.drawFlag)
+	fmt.Printf("\nDelay Timer: \n%v \n", cpu.delayTimer)
+	fmt.Printf("\nSound Timer: \n%v \n", cpu.soundTimer)
+	fmt.Printf("\nKeyboard: \n%v \n", cpu.keyboard)
+	fmt.Println("\n-- FINISHED PRINTING STATUS OF CPU --")
 }
+
 
 // ResetCPU sets the CPU to an initial state ready to run
 func (cpu *CPU) ResetCPU() {
 	cpu.pc = 0x200                 // Program counter starts ot 0x200
 	cpu.opcode = 0x0               // Reset current opcode
-	cpu.i = 0x0                    // Reset index register
+	cpu.i = 0x0                // Reset index register
 	cpu.sp = 0x0                   // Reset stack pointer
 	cpu.display = [64 * 32]uint8{} // Clear the display
 	cpu.stack = [16]uint16{}       // Clear the stack

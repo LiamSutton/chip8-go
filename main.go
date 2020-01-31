@@ -10,4 +10,5 @@ func main() {
 	cpu := vm.NewCPU()
 	cpu.ResetCPU()
 	cpu.PrintStatus()
+
 }
