@@ -85,8 +85,10 @@ func (cpu *CPU) EmulateCycle() {
 	// Fetch Opcode
 	cpu.opcode = uint16(cpu.memory[cpu.pc])<<8 | uint16(cpu.memory[cpu.pc+1])
 
-	switch cpu.opcode {
+	switch cpu.opcode & 0xF000 {
+	case 0x0000:
+		cpu.opcode0X0000()
 	default:
-		fmt.Printf("Unimplimented opcode: 0x%X", cpu.opcode)
+		fmt.Printf("Unimplimented opcode: 0x%X\n", cpu.opcode)
 	}
 }

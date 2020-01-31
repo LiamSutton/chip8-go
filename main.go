@@ -14,7 +14,7 @@ func main() {
 
 	cpu.LoadROM(rom)
 
-	for {
+	for i := 0; i < 2; i++ {
 		cpu.EmulateCycle()
 	}
 }
