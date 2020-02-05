@@ -54,24 +54,25 @@ func (cpu *CPU) opcode0xA000() {
 
 func (cpu *CPU) opcode0xD000() {
 	// Draws sprite (dummy method for now)
-	fmt.Println("0xD000: Drawing sprite to the screen")
 
-	x := cpu.v[(cpu.opcode&0x0F00)>>8]
-	y := cpu.v[(cpu.opcode&0x00F0)>>4]
-	height := uint8(cpu.opcode & 0x000F)
-
+	x := uint16(cpu.v[(cpu.opcode&0x0F00)>>8])
+	y := uint16(cpu.v[(cpu.opcode&0x00F0)>>4])
+	height := cpu.opcode & 0x000F
+	fmt.Printf("0xD000: Drawing a sprite at X: %d, Y: %d with a height of %d", x, y, height)
 	cpu.v[0xF] = 0
 
-	for yline := uint8(0); yline < height; yline++ {
-
-		pixel := cpu.memory[uint8(cpu.i)+yline]
-
-		for xline := uint8(0); xline < 8; xline++ {
+	for yline := uint16(0); yline < height; yline++ {
+		pixel := uint16(cpu.memory[cpu.i+yline])
+		for xline := uint16(0); xline < 8; xline++ {
+			index := (x + xline + ((y + yline) * 64))
+			if index > uint16(len(cpu.display)) {
+				continue
+			}
 			if pixel&(0x80>>xline) != 0 {
-				if cpu.display[(x+xline+((y+yline)*64))] == 1 {
+				if cpu.display[index] == 1 {
 					cpu.v[0xF] = 1
 				}
-				cpu.display[x+xline+(y+yline)] ^= 1
+				cpu.display[index] ^= 1
 			}
 		}
 	}

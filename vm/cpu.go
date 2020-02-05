@@ -80,6 +80,16 @@ func (cpu *CPU) ResetCPU() {
 	cpu.soundTimer = 0x0 // Reset the sound timer
 }
 
+// GetDisplay will return the current display for the CPU
+func (cpu *CPU) GetDisplay() [64 * 32]uint8 {
+	return cpu.display
+}
+
+// ShouldDraw returns the current state of the drawFlag
+func (cpu *CPU) ShouldDraw() bool {
+	return cpu.drawFlag
+}
+
 // EmulateCycle will fetch, decode and execute a single opcode
 func (cpu *CPU) EmulateCycle() {
 	// Fetch Opcode

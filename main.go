@@ -10,6 +10,13 @@ import (
 
 var roms = []string{"roms/Chip8 Picture.ch8"}
 
+var win *pixelgl.Window
+
+const (
+	sizeX, sizeY              = 64, 32
+	screenWidth, screenHeight = float64(1024), float64(768)
+)
+
 func main() {
 	cpu := vm.NewCPU()
 	cpu.ResetCPU()
@@ -25,30 +32,52 @@ func main() {
 }
 
 func run() {
+	cpu := vm.NewCPU()
+	cpu.ResetCPU()
+	rom := vm.ReadROM(roms[0])
+	cpu.LoadROM(rom)
+
+	programSetup()
+
+	for !win.Closed() {
+		cpu.EmulateCycle()
+		if cpu.ShouldDraw() {
+			draw(cpu.GetDisplay())
+		} else {
+			win.UpdateInput()
+		}
+	}
+}
+
+func programSetup() {
 	cfg := pixelgl.WindowConfig{
 		Title:  "Chip-8 Go",
 		Bounds: pixel.R(0, 0, 1024, 768),
 		VSync:  true,
 	}
 
-	win, err := pixelgl.NewWindow(cfg)
+	var err error
+	win, err = pixelgl.NewWindow(cfg)
 	if err != nil {
 		panic(err)
 	}
+}
 
+func draw(display [64 * 32]uint8) {
+	win.Clear(colornames.Black)
 	imd := imdraw.New(nil)
-
-	imd.Color = pixel.RGB(1, 0, 0)
-	imd.Push(pixel.V(200, 100))
-	imd.Color = pixel.RGB(0, 1, 0)
-	imd.Push(pixel.V(800, 100))
-	imd.Color = pixel.RGB(0, 0, 1)
-	imd.Push(pixel.V(500, 700))
-	imd.Polygon(0)
-
-	for !win.Closed() {
-		win.Clear(colornames.Black)
-		imd.Draw(win)
-		win.Update()
+	imd.Color = pixel.RGB(1, 1, 1)
+	screenWidth := win.Bounds().W()
+	width, height := screenWidth/sizeX, screenHeight/sizeY
+	for x := 0; x < 64; x++ {
+		for y := 0; y < 32; y++ {
+			if display[(31-y)*64+x] == 1 {
+				imd.Push(pixel.V(width*float64(x), height*float64(y)))
+				imd.Push(pixel.V(width*float64(x)+width, height*float64(y)+height))
+				imd.Rectangle(0)
+			}
+		}
 	}
+	imd.Draw(win)
+	win.Update()
 }
