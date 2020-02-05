@@ -20,3 +20,10 @@ func (cpu *CPU) opcode0xA000() {
 	cpu.i = cpu.opcode & 0x0FFF
 	cpu.pc += 2
 }
+
+func (cpu *CPU) opcode0x6000() {
+	// Put the value KK into the register Vx
+	fmt.Println("Putting the value KK into register Vx")
+	cpu.v[(cpu.opcode&0x0F00)>>8] = uint8(cpu.opcode & 0x00FF)
+	cpu.pc += 2
+}
