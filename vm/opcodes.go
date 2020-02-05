@@ -34,6 +34,20 @@ func (cpu *CPU) opcode0x3000() {
 	}
 }
 
+func (cpu *CPU) opcode0x4000() {
+	// Skip next instruction if Vx != NN
+	x := (cpu.opcode & 0x0F00) >> 8
+	nn := uint8(cpu.opcode & 0x00FF)
+
+	if cpu.v[x] != nn {
+		fmt.Printf("0x4000: Vx: 0x%X != NN: 0x%X, skipping next instruction\n", cpu.v[x], nn)
+		cpu.pc += 4
+	} else {
+		fmt.Printf("0x4000: Vx: 0x%X ==  NN: 0x%X, not skipping next instruction\n", cpu.v[x], nn)
+		cpu.pc += 2
+	}
+}
+
 func (cpu *CPU) opcode0x6000() {
 	// Put the value KK into the register Vx
 	x := (cpu.opcode & 0x0F00) >> 8
