@@ -1,12 +1,22 @@
 package vm
 
-func (cpu *CPU) opcode0X0000() {
+import "fmt"
+
+func (cpu *CPU) opcode0x0000() {
 	switch cpu.opcode & 0x00FF {
-	case 0x0000: // 0x00E0 : Clear the screen
+	case 0x00E0: // Clear the screen
+		fmt.Println("0x00E0: Clearing the screen")
 		cpu.display = [64 * 32]uint8{}
 		cpu.pc += 2
-	case 0x00E0: // 0x00EE : Return from a subroutine
-		cpu.pc = cpu.stack[cpu.sp]
-		cpu.sp--
+
+	case 0x00EE:
+		fmt.Println("Return")
 	}
+}
+
+func (cpu *CPU) opcode0xA000() {
+	// Set I register -> NNNN
+	fmt.Println("0xA000: Setting I -> NNN")
+	cpu.i = cpu.opcode & 0x0FFF
+	cpu.pc += 2
 }
