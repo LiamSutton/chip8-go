@@ -23,7 +23,13 @@ func (cpu *CPU) opcode0xA000() {
 
 func (cpu *CPU) opcode0x6000() {
 	// Put the value KK into the register Vx
-	fmt.Println("Putting the value KK into register Vx")
+	fmt.Println("0x6000: Putting the value KK into register Vx")
 	cpu.v[(cpu.opcode&0x0F00)>>8] = uint8(cpu.opcode & 0x00FF)
+	cpu.pc += 2
+}
+
+func (cpu *CPU) opcode0xD000() {
+	// Draws sprite (dummy method for now)
+	fmt.Println("0xD000: Drawing sprite to the screen")
 	cpu.pc += 2
 }
