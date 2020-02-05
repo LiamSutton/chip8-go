@@ -10,7 +10,9 @@ func (cpu *CPU) opcode0x0000() {
 		cpu.pc += 2
 
 	case 0x00EE:
-		fmt.Println("Return")
+		// Return from a sub-routine
+		cpu.pc = cpu.stack[cpu.sp]
+		cpu.sp--
 	}
 }
 
@@ -18,6 +20,14 @@ func (cpu *CPU) opcode0x1000() {
 	// Jump to address NNN
 	nnn := cpu.opcode & 0x0FFF
 	fmt.Printf("0x1000: Jumping to address NNN: 0x%X\n", nnn)
+	cpu.pc = nnn
+}
+
+func (cpu *CPU) opcode0x2000() {
+	// Call subroutine at NNN
+	nnn := cpu.opcode & 0x0FFF
+	cpu.stack[cpu.sp] = cpu.opcode
+	cpu.sp++
 	cpu.pc = nnn
 }
 
