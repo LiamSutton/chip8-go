@@ -14,11 +14,15 @@ func (cpu *CPU) opcode0x0000() {
 	}
 }
 
-func (cpu *CPU) opcode0xA000() {
-	// Set I register -> NNNN
-	fmt.Println("0xA000: Setting I -> NNN")
-	cpu.i = cpu.opcode & 0x0FFF
-	cpu.pc += 2
+func (cpu *CPU) opcode0x3000() {
+	// skip next instruction if Vx == NN
+	if cpu.v[(cpu.opcode&0x0F00)>>8] == uint8(cpu.opcode&0x00FF) {
+		fmt.Println("0x3000: Vx == NN, skipping next instruction")
+		cpu.pc += 4
+	} else {
+		fmt.Println("0x3000: Vx != NN, not skipping next instruction")
+		cpu.pc += 2
+	}
 }
 
 func (cpu *CPU) opcode0x6000() {
@@ -28,15 +32,22 @@ func (cpu *CPU) opcode0x6000() {
 	cpu.pc += 2
 }
 
-func (cpu *CPU) opcode0xD000() {
-	// Draws sprite (dummy method for now)
-	fmt.Println("0xD000: Drawing sprite to the screen")
-	cpu.pc += 2
-}
-
 func (cpu *CPU) opcode0x7000() {
 	// Adds NN to Vx (carry flag unchanged)
 	fmt.Println("0x7000: Adding NN to Vx (carry flag unchanged")
 	cpu.v[(cpu.opcode&0x0F00)>>8] += uint8(cpu.opcode & 0x00FF)
+	cpu.pc += 2
+}
+
+func (cpu *CPU) opcode0xA000() {
+	// Set I register -> NNNN
+	fmt.Println("0xA000: Setting I -> NNN")
+	cpu.i = cpu.opcode & 0x0FFF
+	cpu.pc += 2
+}
+
+func (cpu *CPU) opcode0xD000() {
+	// Draws sprite (dummy method for now)
+	fmt.Println("0xD000: Drawing sprite to the screen")
 	cpu.pc += 2
 }
