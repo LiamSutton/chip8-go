@@ -80,6 +80,20 @@ func (cpu *CPU) opcode0x7000() {
 	cpu.pc += 2
 }
 
+func (cpu *CPU) opcode0x9000() {
+	// Skip next instruction if Vx != Vy
+	x := (cpu.opcode & 0x0F00) >> 8
+	y := (cpu.opcode & 0x00F0) >> 4
+
+	if cpu.v[x] != cpu.v[y] {
+		fmt.Printf("0x5000: Vx: 0x%X != Vy: 0x%X, skipping next instruction", cpu.v[x], cpu.v[y])
+		cpu.pc += 4
+	} else {
+		fmt.Printf("0x5000: Vx: 0x%X == Vy: 0x%X, not skipping next instruction", cpu.v[x], cpu.v[y])
+		cpu.pc += 2
+	}
+}
+
 func (cpu *CPU) opcode0xA000() {
 	// Set I register -> NNN
 	nnn := cpu.opcode & 0x0FFF

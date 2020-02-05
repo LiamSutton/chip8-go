@@ -110,6 +110,8 @@ func (cpu *CPU) EmulateCycle() {
 		cpu.opcode0x6000()
 	case 0x7000:
 		cpu.opcode0x7000()
+	case 0x9000:
+		cpu.opcode0x9000()
 	case 0xA000:
 		cpu.opcode0xA000()
 	case 0xD000:
