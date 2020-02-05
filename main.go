@@ -8,7 +8,7 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-var roms = []string{"roms/Chip8 Picture.ch8"}
+var roms = []string{"roms/Chip8 Picture.ch8", "roms/test_opcode.ch8"}
 
 var win *pixelgl.Window
 
@@ -34,7 +34,7 @@ func main() {
 func run() {
 	cpu := vm.NewCPU()
 	cpu.ResetCPU()
-	rom := vm.ReadROM(roms[0])
+	rom := vm.ReadROM(roms[1])
 	cpu.LoadROM(rom)
 
 	programSetup()
@@ -64,13 +64,13 @@ func programSetup() {
 }
 
 func draw(display [64 * 32]uint8) {
-	win.Clear(colornames.Black)
-	imd := imdraw.New(nil)
-	imd.Color = pixel.RGB(1, 1, 1)
-	screenWidth := win.Bounds().W()
-	width, height := screenWidth/sizeX, screenHeight/sizeY
-	for x := 0; x < 64; x++ {
-		for y := 0; y < 32; y++ {
+	win.Clear(colornames.Black)                            // Clear the window
+	imd := imdraw.New(nil)                                 // Create a new imdraw object
+	imd.Color = pixel.RGB(1, 1, 1)                         // Set the color to white
+	screenWidth := win.Bounds().W()                        // The width of the screen
+	width, height := screenWidth/sizeX, screenHeight/sizeY //
+	for x := 0; x < 64; x++ {                              // The screen is 64 pixels across
+		for y := 0; y < 32; y++ { // The screen is 32 pixels high
 			if display[(31-y)*64+x] == 1 {
 				imd.Push(pixel.V(width*float64(x), height*float64(y)))
 				imd.Push(pixel.V(width*float64(x)+width, height*float64(y)+height))
