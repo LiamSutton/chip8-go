@@ -90,8 +90,12 @@ func (cpu *CPU) EmulateCycle() {
 		cpu.opcode0x0000()
 	case 0x6000:
 		cpu.opcode0x6000()
+	case 0x7000:
+		cpu.opcode0x7000()
 	case 0xA000:
 		cpu.opcode0xA000()
+	case 0xD000:
+		cpu.opcode0xD000()
 	default:
 		fmt.Printf("Unimplemented Opcode: [0x%X]\n", cpu.opcode)
 	}
