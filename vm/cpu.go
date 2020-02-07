@@ -93,6 +93,8 @@ func (cpu *CPU) ShouldDraw() bool {
 // EmulateCycle will fetch, decode and execute a single opcode
 func (cpu *CPU) EmulateCycle() {
 	// Fetch Opcode
+	// Opcodes are 2 Bytes long, get first byte -> shift it 8 bits to the left then OR it with the second byte to get the full opcode
+	// EG: byte 1 = 10010110, byte 2 = 00011101, byte 1 << 8 = 1001011000000000, byte 1 | byte 2 = 1001011000011101 (full opcode)
 	cpu.opcode = uint16(cpu.memory[cpu.pc])<<8 | uint16(cpu.memory[cpu.pc+1])
 
 	switch cpu.opcode & 0xF000 {
@@ -118,8 +120,14 @@ func (cpu *CPU) EmulateCycle() {
 		cpu.opcode0x9000()
 	case 0xA000:
 		cpu.opcode0xA000()
+	case 0xB000:
+		cpu.opcode0xB000()
+	case 0xC000:
+		cpu.opcode0xC000()
 	case 0xD000:
 		cpu.opcode0xD000()
+	case 0xE000:
+		// TODO
 	case 0xF000:
 		cpu.opcode0xF000()
 	default:

@@ -2,6 +2,8 @@ package vm
 
 import "fmt"
 
+import "math/rand"
+
 func (cpu *CPU) opcode0x0000() {
 	switch cpu.opcode & 0x00FF {
 	case 0x00E0: // Clear the screen
@@ -202,6 +204,23 @@ func (cpu *CPU) opcode0xA000() {
 	cpu.pc += 2
 }
 
+func (cpu *CPU) opcode0xB000() {
+	// Jump to location nnn + V0.
+	nnn := cpu.opcode & 0x0FFF
+	cpu.pc = nnn + uint16(cpu.v[0x0])
+	fmt.Printf("0xB00: Jumping to address: 0x%X\n", cpu.pc)
+}
+
+func (cpu *CPU) opcode0xC000() {
+	// Set Vx = random byte AND kk.
+	x := uint16((cpu.opcode & 0x0F00)) >> 8
+	kk := uint8(cpu.opcode & 0x00FF)
+	r := uint8(rand.Intn(255))
+
+	cpu.v[x] = r & kk
+	cpu.pc += 2
+}
+
 func (cpu *CPU) opcode0xD000() {
 	x := uint16(cpu.v[(cpu.opcode&0x0F00)>>8])
 	y := uint16(cpu.v[(cpu.opcode&0x00F0)>>4])
@@ -236,7 +255,18 @@ func (cpu *CPU) opcode0xF000() {
 		x := (cpu.opcode & 0x0F00) >> 8
 		cpu.v[x] = cpu.delayTimer
 	case 0x000A:
-		fmt.Println("0xF00A")
+		// Wait for a key press, store the value of the key in Vx.
+		x := (cpu.opcode & 0x0F00) >> 8
+		fmt.Printf("0x000A: Waiting for keypress: HALTING\n")
+		for {
+			for i := uint8(0); i < 16; i++ {
+				if cpu.keyboard[i] == true {
+					fmt.Printf("0x00A: Got keypress: 0x%v\n", i)
+					cpu.v[x] = i
+					break
+				}
+			}
+		}
 	case 0x0015:
 		// Set delay timer = Vx
 		fmt.Printf("0xF015: Setting delay timer = Vx\n")
@@ -260,6 +290,33 @@ func (cpu *CPU) opcode0xF000() {
 		}
 
 		cpu.i = result
+		cpu.pc += 2
+	case 0x0029:
+		// Set I = location of sprite for digit Vx.
+		x := uint16(((cpu.opcode & 0x0F00) >> 8)) * 5
+		location := uint16(cpu.v[x])
+		cpu.i = location
+		cpu.pc += 2
+	case 0x0033:
+		// Store BCD representation of Vx in memory locations I, I+1, and I+2.
+		x := (cpu.opcode & 0x0F00) >> 8
+
+		cpu.memory[cpu.i] = cpu.v[x] / 100
+		cpu.memory[cpu.i+1] = (cpu.v[x] / 10) % 10
+		cpu.memory[cpu.i+2] = (cpu.v[x] % 100) % 10
+		cpu.pc += 2
+
+		fmt.Printf("Storing BCD of Vx: 0x%X in memory locations I, I+1, I+2, I: 0x%X\n", cpu.v[x], cpu.i)
+	case 0x0055:
+		// Store registers V0 through Vx in memory starting at location I.
+		for j := uint16(0); j < 16; j++ {
+			cpu.memory[cpu.i+j] = cpu.v[j]
+		}
+		cpu.pc += 2
+	case 0x0065:
+		for j := uint16(0); j < 16; j++ {
+			cpu.v[j] = cpu.memory[cpu.i+j]
+		}
 		cpu.pc += 2
 	default:
 		fmt.Printf("Unimplemented opcode: 0x%X\n", cpu.opcode)

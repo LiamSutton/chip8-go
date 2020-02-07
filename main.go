@@ -8,7 +8,7 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-var roms = []string{"roms/Chip8 Picture.ch8", "roms/test_opcode.ch8"}
+var roms = []string{"roms/Chip8 Picture.ch8", "roms/test_opcode.ch8", "roms/pong.ch8"}
 
 var win *pixelgl.Window
 
