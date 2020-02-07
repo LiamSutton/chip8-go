@@ -97,10 +97,36 @@ func (cpu *CPU) opcode0x8000() {
 		// Store Vy in Vx
 		x := (cpu.opcode & 0x0F00) >> 8
 		y := (cpu.opcode & 0x00F0) >> 4
-		fmt.Printf("Storing Vy: 0x%X in Vx: 0x%X\n", cpu.v[x], cpu.v[y])
+		fmt.Printf("0x8000: Storing Vy: 0x%X in Vx: 0x%X\n", cpu.v[x], cpu.v[y])
 
 		cpu.v[x] = cpu.v[y]
 
+		cpu.pc += 2
+	case 0x0001:
+		// Set Vx = Vx OR Vy
+		x := (cpu.opcode & 0x0F00) >> 8
+		y := (cpu.opcode & 0x00F0) >> 4
+		xy := cpu.v[x] | cpu.v[y]
+
+		cpu.v[x] = xy
+		fmt.Printf("0x8001: Bitwise OR on Vx: 0x%X and Vy: 0x%X, Result: Vx = 0x%X\n", cpu.v[x], cpu.v[y], xy)
+		cpu.pc += 2
+	case 0x0002:
+		// Set Vx = Vx AND Vy
+		x := (cpu.opcode & 0x0F00) >> 8
+		y := (cpu.opcode & 0x00F0) >> 4
+		xy := cpu.v[x] & cpu.v[y]
+		cpu.v[x] = xy
+		fmt.Printf("0x8002: Bitwise AND on Vx: 0x%X and Vy: 0x%X, Result: Vx = 0x%X\n", cpu.v[x], cpu.v[y], xy)
+		cpu.pc += 2
+	case 0x003:
+		// Set Vx = Vx XOR Vy
+		x := (cpu.opcode & 0x0F00) >> 8
+		y := (cpu.opcode & 0x00F0) >> 4
+		xy := cpu.v[x] | cpu.v[y]
+
+		cpu.v[x] = xy
+		fmt.Printf("0x8003: Bitwise XOR on Vx: 0x%X and Vy: 0x%X, Result: Vx = 0x%X\n", cpu.v[x], cpu.v[y], xy)
 		cpu.pc += 2
 	default:
 		fmt.Printf("Unimplemented opcode: 0x%X\n", cpu.opcode)
