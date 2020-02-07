@@ -10,8 +10,8 @@ func (cpu *CPU) opcode0x0000() {
 		cpu.pc += 2
 
 	case 0x00EE:
-		// Return from a sub-routine
-		cpu.pc = cpu.stack[cpu.sp]
+		fmt.Printf("0x00EE: Returning from subroutine")
+		cpu.pc = cpu.stack[cpu.sp] + 2
 		cpu.sp--
 	}
 }
@@ -25,10 +25,11 @@ func (cpu *CPU) opcode0x1000() {
 
 func (cpu *CPU) opcode0x2000() {
 	// Call subroutine at NNN
-	nnn := cpu.opcode & 0x0FFF
-	cpu.stack[cpu.sp] = cpu.opcode
 	cpu.sp++
+	cpu.stack[cpu.sp] = cpu.pc
+	nnn := cpu.opcode & 0x0FFF
 	cpu.pc = nnn
+	fmt.Printf("0x2000: calling subroutine at 0x%X\n", nnn)
 }
 
 func (cpu *CPU) opcode0x3000() {
@@ -90,6 +91,22 @@ func (cpu *CPU) opcode0x7000() {
 	cpu.pc += 2
 }
 
+func (cpu *CPU) opcode0x8000() {
+	switch cpu.opcode & 0x000F {
+	case 0x0000:
+		// Store Vy in Vx
+		x := (cpu.opcode & 0x0F00) >> 8
+		y := (cpu.opcode & 0x00F0) >> 4
+		fmt.Printf("Storing Vy: 0x%X in Vx: 0x%X\n", cpu.v[x], cpu.v[y])
+
+		cpu.v[x] = cpu.v[y]
+
+		cpu.pc += 2
+	default:
+		fmt.Printf("Unimplemented opcode: 0x%X\n", cpu.opcode)
+	}
+}
+
 func (cpu *CPU) opcode0x9000() {
 	// Skip next instruction if Vx != Vy
 	x := (cpu.opcode & 0x0F00) >> 8
@@ -136,4 +153,42 @@ func (cpu *CPU) opcode0xD000() {
 	}
 	cpu.drawFlag = true
 	cpu.pc += 2
+}
+
+func (cpu *CPU) opcode0xF000() {
+	switch cpu.opcode & 0x00FF {
+	case 0x0007:
+		fmt.Printf("0xF007: Setting Vx = delay timer\n")
+		// Set Vx -> delay timer
+		x := (cpu.opcode & 0x0F00) >> 8
+		cpu.v[x] = cpu.delayTimer
+	case 0x000A:
+		fmt.Println("0xF00A")
+	case 0x0015:
+		// Set delay timer = Vx
+		fmt.Printf("0xF015: Setting delay timer = Vx\n")
+		x := (cpu.opcode & 0x0F00) >> 8
+		cpu.delayTimer = cpu.v[x]
+	case 0x0018:
+		// Set sound timer = Vx
+		fmt.Printf("Setting sound timer = Vx\n")
+		x := (cpu.opcode & 0x0F00) >> 8
+		cpu.soundTimer = cpu.v[x]
+	case 0x001E:
+		// Adds Vx to I, if overflow occurs VF = 1
+		x := (cpu.opcode & 0x0F00) >> 8
+		result := cpu.i + uint16(cpu.v[x])
+		if result >= 0xFFF {
+			// Overflow
+			cpu.v[0xF] = 1
+		} else {
+			// No overflow
+			cpu.v[0xF] = 0
+		}
+
+		cpu.i = result
+		cpu.pc += 2
+	default:
+		fmt.Printf("Unimplemented opcode: 0x%X\n", cpu.opcode)
+	}
 }

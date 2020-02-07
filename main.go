@@ -21,13 +21,6 @@ func main() {
 	cpu := vm.NewCPU()
 	cpu.ResetCPU()
 
-	// rom := vm.ReadROM(roms[0])
-
-	// cpu.LoadROM(rom)
-
-	// for i := 0; i < 100; i++ {
-	// 	cpu.EmulateCycle()
-	// }
 	pixelgl.Run(run)
 }
 
