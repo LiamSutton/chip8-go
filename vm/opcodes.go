@@ -128,6 +128,19 @@ func (cpu *CPU) opcode0x8000() {
 		cpu.v[x] = xy
 		fmt.Printf("0x8003: Bitwise XOR on Vx: 0x%X and Vy: 0x%X, Result: Vx = 0x%X\n", cpu.v[x], cpu.v[y], xy)
 		cpu.pc += 2
+	case 0x004:
+		// Set Vx = Vx + Vy, set VF = carry.
+		x := (cpu.opcode & 0x0F00) >> 8
+		y := (cpu.opcode & 0x00F0) >> 4
+		xy := cpu.v[x] + cpu.v[y]
+		if xy > 0xFF {
+			cpu.v[0xF] = 1
+		} else {
+			cpu.v[0xF] = 0
+		}
+
+		cpu.v[x] = xy
+		cpu.pc += 2
 	default:
 		fmt.Printf("Unimplemented opcode: 0x%X\n", cpu.opcode)
 	}
