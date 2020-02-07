@@ -5,15 +5,22 @@ import "fmt"
 func (cpu *CPU) opcode0x0000() {
 	switch cpu.opcode & 0x00FF {
 	case 0x00E0: // Clear the screen
-		fmt.Println("0x00E0: Clearing the screen")
-		cpu.display = [64 * 32]uint8{}
-		cpu.pc += 2
-
+		cpu.opcode0x00E0()
 	case 0x00EE:
-		fmt.Printf("0x00EE: Returning from subroutine")
-		cpu.pc = cpu.stack[cpu.sp] + 2
-		cpu.sp--
+		cpu.opcode0x00EE()
 	}
+}
+
+func (cpu *CPU) opcode0x00E0() {
+	fmt.Println("0x00E0: Clearing the screen")
+	cpu.display = [64 * 32]uint8{}
+	cpu.pc += 2
+}
+
+func (cpu *CPU) opcode0x00EE() {
+	fmt.Printf("0x00EE: Returning from subroutine")
+	cpu.pc = cpu.stack[cpu.sp] + 2
+	cpu.sp--
 }
 
 func (cpu *CPU) opcode0x1000() {
@@ -138,9 +145,36 @@ func (cpu *CPU) opcode0x8000() {
 		} else {
 			cpu.v[0xF] = 0
 		}
-
+		fmt.Printf("0x8004: Setting Vx: 0x%X += Vy: 0x%X, Vf = 0x%X\n", cpu.v[x], cpu.v[y], cpu.v[0xF])
 		cpu.v[x] = xy
 		cpu.pc += 2
+	case 0x005:
+		// Set Vx = Vx - Vy, set VF = NOT borrow.
+		x := (cpu.opcode & 0x0F00) >> 8
+		y := (cpu.opcode & 0x00F0) >> 4
+
+		if cpu.v[x] > cpu.v[y] {
+			cpu.v[0xF] = 1
+		} else {
+			cpu.v[0xF] = 0
+		}
+		fmt.Printf("0x8005: Setting Vx: 0x%X -= Vy: 0x%X, Vf = 0x%X\n", cpu.v[x], cpu.v[y], cpu.v[0xF])
+		cpu.v[x] -= cpu.v[y]
+		cpu.pc += 2
+	case 0x006:
+		x := (cpu.opcode & 0x0F00) >> 8
+		cpu.v[0xF] = cpu.v[x] & 0x1
+		fmt.Printf("0x800E: Shifting Vx: 0x%X Left 1 bit\n", cpu.v[x])
+		cpu.v[x] >>= 1
+		cpu.pc += 2
+	case 0x00E:
+		//Set Vx = Vx SHL 1.
+		x := (cpu.opcode & 0x0F00) >> 8
+		cpu.v[0xF] = cpu.v[x] >> 7
+		fmt.Printf("0x800E: Shifting Vx: 0x%X Left 1 bit\n", cpu.v[x])
+		cpu.v[x] <<= 1
+		cpu.pc += 2
+
 	default:
 		fmt.Printf("Unimplemented opcode: 0x%X\n", cpu.opcode)
 	}
