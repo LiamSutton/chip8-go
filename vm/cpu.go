@@ -127,7 +127,7 @@ func (cpu *CPU) EmulateCycle() {
 	case 0xD000:
 		cpu.opcode0xD000()
 	case 0xE000:
-		// TODO
+		cpu.opcode0xE000()
 	case 0xF000:
 		cpu.opcode0xF000()
 	default:

@@ -20,7 +20,7 @@ func (cpu *CPU) opcode0x00E0() {
 }
 
 func (cpu *CPU) opcode0x00EE() {
-	fmt.Printf("0x00EE: Returning from subroutine")
+	fmt.Printf("0x00EE: Returning from subroutine\n")
 	cpu.pc = cpu.stack[cpu.sp] + 2
 	cpu.sp--
 }
@@ -245,6 +245,31 @@ func (cpu *CPU) opcode0xD000() {
 	}
 	cpu.drawFlag = true
 	cpu.pc += 2
+}
+
+func (cpu *CPU) opcode0xE000() {
+	switch cpu.opcode * 0x00FF {
+	case 0x009E:
+		// Skip next instruction if key with the value of Vx is pressed.
+		x := (cpu.opcode & 0x0F00) >> 8
+		if cpu.keyboard[cpu.v[x]] {
+			fmt.Printf("0xE09E: Key: 0x%X is pressed, skipping next instruction\n", cpu.v[x])
+			cpu.pc += 4
+		} else {
+			fmt.Printf("0xE09E: Key: 0x%X not pressed, not skipping next instruction\n", cpu.v[x])
+			cpu.pc += 2
+		}
+	case 0x00A1:
+		// Skip next instruction if key with the value of Vx is NOT pressed
+		x := (cpu.opcode & 0x0F00) >> 8
+		if !cpu.keyboard[cpu.v[x]] {
+			fmt.Printf("0xE0A1: Key: 0x%X not pressed, skipping next instruction\n", cpu.v[x])
+			cpu.pc += 4
+		} else {
+			fmt.Printf("0xE0A1: Key: 0x%X pressed, not skipping next instruction\n", cpu.v[x])
+			cpu.pc += 2
+		}
+	}
 }
 
 func (cpu *CPU) opcode0xF000() {
